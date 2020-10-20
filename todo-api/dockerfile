@@ -1,0 +1,15 @@
+# Build API
+# This Dockerfile is very inefficient.  Convert this to a multi-stage docker build with a node12 container used as runtime.
+# If done correctly the final image should be < 300 MB.
+FROM node:12 AS base
+WORKDIR /app
+COPY ./package.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+# CMD ["npm", "run", "start:prod"]
+# Applied muti-stage build to reduce image size from 1.7gb to 187mb
+FROM alpine:latest
+WORKDIR /app
+COPY --from=base ./app ./
+# CMD ["npm", "run", "start:prod"]
